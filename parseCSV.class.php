@@ -12,29 +12,44 @@ class ParseCSV
     public function __construct($file = '')
     {
         $this->setFile($file);
+        $this->actionFile();
     }
     
     public function getContent()
     {
-        $this->test = function () {
-            return 'salut';
-        };
-        $file = $this->file;
+        
         $row = 1;
-        $array = [];
-        if (($handle = fopen($file, "r")) !== FALSE) {
-            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        $arrayData = [];
+        $colName;
+        
+        if (($handle = fopen($this->file, "r")) !== FALSE) {
+            while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
                 $num = count($data);
                 $col = [];
-                for ($c=0; $c < $num; $c++) {
-                   $col[] = $data[$c];
+                if($row === 1) {
+                    $colName = $data;
                 }
-                $array["Row $row: $num champs"] = $col;
+                for ($c=0; $c < $num; $c++) {
+                    $col[$colName[$c]] = $this->_actionFile['testEmpty']($data[$c]);
+                }
+                $arrayData["Row $row: $num champs"] = $col;
                 $row++;
             }
             fclose($handle);
         }
-        //return $array;
+        return $arrayData;
+    }
+    
+    private function actionFile () 
+    {
+        $this->_actionFile = [
+            'testEmpty' => function($val) {
+                return (empty($val)) ? "empty" : $val;
+            },
+            'testInt' => function($val) {
+                //some code
+            }
+        ];
     }
 }
 
